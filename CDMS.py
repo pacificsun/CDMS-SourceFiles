@@ -9,30 +9,35 @@ con = sqlite3.connect('user.db')
 
 cur = con.cursor()
 
-# Create a Table for User
+listOfTables = cur.execute("""SELECT * FROM sqlite_master WHERE type='table'
+  AND name='user'; """).fetchall()
 
-cur.execute("""CREATE TABLE user (
-    full_name text,
-    street_name text,
-    house_no text,
-    zip_code text,
-    city text,
-    email text,
-    mobile_phone text
-)""")
+print("ListOfTable::", listOfTables)
+
+if(listOfTables) == []:
+        # Create a Table for User
+    cur.execute("""CREATE TABLE user (
+        full_name text,
+        street_name text,
+        house_no text,
+        zip_code text,
+        city text,
+        email text,
+        mobile_phone text
+    )""")
             
 # Create a Table for logs
 
-cur.execute("""CREATE TABLE logs (
-    username text,
-    date text,
-    Time text,
-    description_of_activity text,
-    additional_information text,
-    suspicious text
-)""")
-         
-            
+    cur.execute("""CREATE TABLE logs (
+        username text,
+        date text,
+        Time text,
+        description_of_activity text,
+        additional_information text,
+        suspicious text
+    )""")
+
+
 # Datatypes
 # Null
 # Integer
@@ -79,6 +84,7 @@ def main():
 
 def create_user():
     print("User create function")
+    
     main()
 def get_user():
     print("get a user")

@@ -1,5 +1,6 @@
 
 import sqlite3
+import datetime
 
 # Create database Connection
 con = sqlite3.connect('user.db')
@@ -65,6 +66,8 @@ con.commit()
 
 con.close()
 
+# regex function
+
 # functions
 def  insert_user_record(username,
         fname,
@@ -100,6 +103,22 @@ def  insert_user_record(username,
     finally:
         db.commit()
         db.close()
+
+def add_admin():
+    username = input("Enter Admin's username: ")
+    fname = input("Enter Admin's first name: ")
+    lname = input("Enter Admin's last name: ")
+    street_name = input("Enter Admin's street name: ")
+    house_no = input("Enter Admin's house no: ")
+    zip_code= input("Enter Admin's zip code: ")
+    city = input("Enter Admin's city: "),
+    email = input("Enter Admin's email: ")
+    mobile_phone = input("Enter Admin's mobile phone: ")
+    role = 'Admin'
+    password = input("Enter Admin's password: ")
+    date = datetime.datetime.now()
+    # TODO: encrypt the password
+    insert_user_record(username, fname, lname, street_name, house_no, zip_code, city, email, mobile_phone, role, password, date)
 
 def get_all_user():
     try:
@@ -155,15 +174,17 @@ def super_main():
     if login_view():
         def main():
             # get user Role
+
             # User menu
             print("Welcome!!!")
             print("*************")
             print("""
-            1. ADD CLIENT TO THE SYSTEM
-            2. UPDATE PASSWORD
-            3. UPDATE CLIENT
-            4. SEARCH AND RETRIVE CLIENT
-            5. GET ALL CLIENTS
+            1. ADD ADMIN TO THE SYSTEM
+            2. UPDATE ADMIN'S PASSWORD
+            3. UPDATE ADMIN'S DETAILS
+            4. DELETE ADMIN
+            5. GET ALL ADMIN
+            6. BACK UP
             """)
             choice = input("ENTER YOUR CHOICE NUMBER OR ENTER 0 TO EXIT : ")
             print("choice>>", choice)
@@ -174,9 +195,8 @@ def super_main():
                     print("Program Closed")
                     system_exit = False
                 elif(choice == '1'):
-                    get_all_user()
-
-                    
+                    add_admin()
+                    print("A new admin added!!!")
                 elif(choice == "2"):
                     get_user()
                 else:
@@ -188,21 +208,12 @@ def super_main():
 
 def create_user():
     print("User create function")
-    
-    main()
 def get_user():
     print("get a user")
 def update_user():
     print("Update user")
 def update_user():
     print("update user")
-
-def loginView():
-    
-    name = input("Enter your username: ")
-    password = input("Enter your password: ")
-     
-     # check user in database
 
 
 # To run the supermain function.

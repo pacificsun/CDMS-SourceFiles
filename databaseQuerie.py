@@ -8,6 +8,11 @@ con = sqlite3.connect('user.db')
 
 cur = con.cursor()
 
+listOfTables = cur.execute(
+  """SELECT tableName FROM sqlite_master WHERE type='table'; """).fetchall()
+
+print("ListOfTable::",listOfTables)
+
 # Create a Table for User
 
 cur.execute("""CREATE TABLE user (

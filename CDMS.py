@@ -12,7 +12,6 @@ cur = con.cursor()
 listOfTables = cur.execute("""SELECT * FROM sqlite_master WHERE type='table'
   AND name='users'; """).fetchall()
 
-print("ListOfTable::", listOfTables)
 
 if(listOfTables) == []:
         # Create a Table for User
@@ -58,13 +57,6 @@ if(listOfTables) == []:
     print("TABLES CREATED SUCCESSFULLY!!!")
     print("SYSTEM DATA IS LOADED SUCCESSFULLY!!!")
 
-
-# Datatypes
-# Null
-# Integer
-# REAL
-# TEXT
-# BLOB
 
 # Commit our command
 con.commit()
@@ -125,18 +117,20 @@ def get_all_user():
         db.close()
 
 def check_auth(username, password):
-    print(username, password)
+    
+    user_credential = {}
+    
     #check the username password are correct
     try:
         db = sqlite3.connect('user.db')
         cursor = db.cursor()
         sql_select_query = "SELECT * FROM users WHERE username=? AND password=?"
         data = cursor.execute(sql_select_query,(username,password))
-        print("data>>", data)
         for row in data:
-           
-            print(row)
-            return row[11]
+            user_credential["user_role"] = row[10]
+            user_credential["Authenticate"] = True
+            print(user_credential)
+            return user_credential
     except: 
         raise Exception('Error occured')
     finally:
@@ -148,42 +142,48 @@ def check_auth(username, password):
 def login_view():
     username = input("Enter username: ")
     password = input("Enter yourpassword: ")
-    check_auth(username, password)
+    login_value = check_auth(username, password)
+    print("login_value::", login_value)
+    if login_value == None:
+        print("Wrong username or password!!!")
+        super_main()    
+    return login_value['Authenticate']
 
 
 # This is main interface for the program
-if login_view():
-    def main():
-       
-        # User menu
-        print("Welcome!!!")
-        print("*************")
-        print("""
-        1. ADD CLIENT TO THE SYSTEM
-        2. UPDATE PASSWORD
-        3. UPDATE CLIENT
-        4. SEARCH AND RETRIVE CLIENT
-        5. GET ALL CLIENTS
-        """)
-        choice = input("ENTER YOUR CHOICE NO OR ENTER 0 TO EXIT : ")
-        print("choice>>", choice)
-        system_exit = True
-        while system_exit:
-        
-            if(choice == '0'):
-                print("Program Closed")
-                system_exit = False
-            elif(choice == '1'):
-                get_all_user()
-
-                
-            elif(choice == "2"):
-                get_user()
-            else:
-                print("wrong Choice")
-                main()
-    main()
+def super_main():
+    if login_view():
+        def main():
+            # get user Role
+            # User menu
+            print("Welcome!!!")
+            print("*************")
+            print("""
+            1. ADD CLIENT TO THE SYSTEM
+            2. UPDATE PASSWORD
+            3. UPDATE CLIENT
+            4. SEARCH AND RETRIVE CLIENT
+            5. GET ALL CLIENTS
+            """)
+            choice = input("ENTER YOUR CHOICE NUMBER OR ENTER 0 TO EXIT : ")
+            print("choice>>", choice)
+            system_exit = True
+            while system_exit:
             
+                if(choice == '0'):
+                    print("Program Closed")
+                    system_exit = False
+                elif(choice == '1'):
+                    get_all_user()
+
+                    
+                elif(choice == "2"):
+                    get_user()
+                else:
+                    print("wrong Choice")
+                    main()
+        main()
+        
 
 
 def create_user():
@@ -196,7 +196,7 @@ def update_user():
     print("Update user")
 def update_user():
     print("update user")
-    
+
 def loginView():
     
     name = input("Enter your username: ")
@@ -205,4 +205,6 @@ def loginView():
      # check user in database
 
 
+# To run the supermain function.
 
+super_main()

@@ -148,9 +148,9 @@ def get_all_user_and_role():
         username_and_role = {}
 
         for record in data:
-           
+            print("Record",record)
             print("USERNAME: ", record[0])
-            print ("ROLE: ", record[10]+'\n')
+            print ("ROLE: ", record[9]+'\n')
            
     finally:
         db.commit()
@@ -198,7 +198,7 @@ def check_auth(username, password):
         sql_select_query = "SELECT * FROM users WHERE username=? AND password=?"
         data = cursor.execute(sql_select_query,(username,password))
         for row in data:
-            user_credential["user_role"] = row[10]
+            user_credential["user_role"] = row[9]
             user_credential["Authenticate"] = True
             print(user_credential)
             return user_credential
@@ -214,16 +214,19 @@ def login_view():
     username = input("Enter username: ")
     password = input("Enter yourpassword: ")
     login_value = check_auth(username, password)
-    print("login_value::", login_value)
     if login_value == None:
         print("Wrong username or password!!!")
         super_main()    
-    return login_value['Authenticate']
+    return login_value
 
 
 # This is main interface for the program
 def super_main():
-    if login_view():
+    login_value =  login_view()
+    print("login_value::", login_value)
+    login_auth = login_value["Authenticate"]
+    login_role = login_value["user_role"]
+    if login_auth:
         def main():
             # get user Role
 
@@ -255,6 +258,8 @@ def super_main():
                     main()
                 elif(choice == "3"):
                     update_admin_password()
+                    print("PASSWORD IS SUCCESFULLY UPDATED!!!")
+                    main()
                 elif(choice == "4"):
                     delete_admin()
                 else:

@@ -66,7 +66,7 @@ con.commit()
 
 con.close()
 
-# regex function
+# regex  input validation function
 
 # functions
 def  insert_user_record(username,
@@ -100,6 +100,8 @@ def  insert_user_record(username,
             password,
             date
             ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)''', (username, fname, lname, street_name, house_no, zip_code, city, email, mobile_phone, role, password, date))
+    except:
+        raise Exception("Error Occured")
     finally:
         db.commit()
         db.close()
@@ -111,7 +113,7 @@ def add_admin():
     street_name = input("Enter Admin's street name: ")
     house_no = input("Enter Admin's house no: ")
     zip_code= input("Enter Admin's zip code: ")
-    city = input("Enter Admin's city: "),
+    city = input("Enter Admin's city: ")
     email = input("Enter Admin's email: ")
     mobile_phone = input("Enter Admin's mobile phone: ")
     role = 'Admin'
@@ -120,21 +122,71 @@ def add_admin():
     # TODO: encrypt the password
     insert_user_record(username, fname, lname, street_name, house_no, zip_code, city, email, mobile_phone, role, password, date)
 
-def get_all_user():
+def get_user_by_username(username):
+    # returns ture if username is found else returns false
+    print("get a user")
+    user_exist = True
+    try: 
+        db = sqlite3.connect('user.db')
+        cursor = db.cursor()
+        sql_select_query = "SELECT * FROM users WHERE username=?"
+        data = cursor.execute(sql_select_query,(username,))
+        for row in data:
+            print("row::", row)
+
+        return user_exist
+    except:
+        raise Exception("Error occured")
+    finally:
+        db.close()
+
+def get_all_user_and_role():
     try:
         db = sqlite3.connect('user.db')
         cursor = db.cursor()
-        data = cursor.execute(''' SELECT * FROM users ORDER BY username''')
+        data = cursor.execute(''' SELECT * FROM users''')
+        username_and_role = {}
+
         for record in data:
-            #print 'ID : '+str(record[0])
-            # print 'NAME : '+str(record[1])
-            # print 'DIVISION : '+str(record[2])
-            # print 'STARS : '+str(record[3])+'\n'
-            print("record::", record)
+           
+            print("USERNAME: ", record[0])
+            print ("ROLE: ", record[10]+'\n')
+           
     finally:
         db.commit()
         db.close()
 
+def update_admin_password():
+    username = input("Enter admin's username that you want to update: ")
+    user_check = get_user_by_username(username)
+    if user_check:
+        newpassword = input("Enter new password: ")
+        try: 
+            db = sqlite3.connect('user.db')
+            cursor = db.cursor()
+            sql_statement = "UPDATE users set password=? WHERE username=?"
+            data = cursor.execute(sql_statement, (newpassword,username))
+            db.commit()
+        except:
+            raise Exception("Error occured")
+        finally:
+            db.close()
+
+def delete_admin():
+    print("Delete Admin")
+    username = input("Enter admin's username that you want to delete")
+    user_check = get_user_by_username(username)
+    if user_check:
+        try: 
+            db = sqlite3.connect('user.db')
+            cursor = db.cursor()
+            sql_statement = "DELETE from users WHERE username=?"
+            data = cursor.execute(sql_statement, (username))
+            db.commit()
+        except:
+            raise Exception("Error occured")
+        finally:
+            db.close() 
 def check_auth(username, password):
     
     user_credential = {}
@@ -176,15 +228,15 @@ def super_main():
             # get user Role
 
             # User menu
-            print("Welcome!!!")
-            print("*************")
+            print("             WELCOME !!!")
+            print("             *************")
             print("""
             1. ADD ADMIN TO THE SYSTEM
-            2. UPDATE ADMIN'S PASSWORD
-            3. UPDATE ADMIN'S DETAILS
+            2. GET LIST OF USER AND ROLE
+            3. UPDATE ADMIN'S PASSWORD
             4. DELETE ADMIN
             5. GET ALL ADMIN
-            6. BACK UP
+            7. BACK UP
             """)
             choice = input("ENTER YOUR CHOICE NUMBER OR ENTER 0 TO EXIT : ")
             print("choice>>", choice)
@@ -197,19 +249,24 @@ def super_main():
                 elif(choice == '1'):
                     add_admin()
                     print("A new admin added!!!")
-                elif(choice == "2"):
-                    get_user()
-                else:
-                    print("wrong Choice")
                     main()
+                elif(choice == "2"):
+                    get_all_user_and_role()
+                    main()
+                elif(choice == "3"):
+                    update_admin_password()
+                elif(choice == "4"):
+                    delete_admin()
+                else:
+                    print("wrong Choice!")
+                   
         main()
         
 
 
 def create_user():
     print("User create function")
-def get_user():
-    print("get a user")
+
 def update_user():
     print("Update user")
 def update_user():

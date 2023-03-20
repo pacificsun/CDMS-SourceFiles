@@ -3,7 +3,6 @@ import sqlite3
 import datetime
 import zipfile
 import re
-import base64
 
 # Create database Connection
 con = sqlite3.connect('user.db')

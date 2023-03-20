@@ -1,6 +1,8 @@
 
 import sqlite3
 import datetime
+import zipfile
+import re
 
 # Create database Connection
 con = sqlite3.connect('user.db')
@@ -66,7 +68,25 @@ con.commit()
 
 con.close()
 
-# regex  input validation function
+# regex  input validation functions
+
+# function validating an Email
+def email_validation(email):
+    regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
+    # pass the regular expression
+    # and the string into the fullmatch() method
+    if(re.fullmatch(regex, email)):
+        print("Valid Email")
+        return email
+    else:
+        print("Invalid Email")
+        return email
+    
+# function validating phonenumber
+def phonenumber_validation(phonenumber):
+    validated_phonenumber = phonenumber.strip()
+    phonenumber_with_code = '+1-6-'+validated_phonenumber
+    return phonenumber_with_code
 
 # functions
 def  insert_user_record(username,
@@ -82,7 +102,10 @@ def  insert_user_record(username,
         password,
         date
         ):
-    print(username, fname, lname, street_name, house_no, zip_code, city, email, mobile_phone, role, password, date)
+    
+    valid_email = email_validation(email)
+    valid_phonenumber = phonenumber_validation(mobile_phone)
+
     try:
         db = sqlite3.connect('user.db')
         cursor = db.cursor()
@@ -99,12 +122,32 @@ def  insert_user_record(username,
             role,
             password,
             date
-            ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)''', (username, fname, lname, street_name, house_no, zip_code, city, email, mobile_phone, role, password, date))
+            ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)''', (username, fname, lname, street_name, house_no, zip_code, city, valid_email, valid_phonenumber, role, password, date))
     except:
         raise Exception("Error Occured")
     finally:
         db.commit()
         db.close()
+
+# Advisor's functions
+
+def add_advisor():
+    username = input("Enter Advisor's username: ")
+    fname = input("Enter Advisor's first name: ")
+    lname = input("Enter Advisor's last name: ")
+    street_name = input("Enter Advisor's street name: ")
+    house_no = input("Enter Advisor's house no: ")
+    zip_code= input("Enter Advisor's zip code: ")
+    city = input("Enter Advisor's city: ")
+    email = input("Enter Advisor's email: ")
+    mobile_phone = input("Enter Advisor's mobile phone: ")
+    role = 'Advisor'
+    password = input("Enter Advisor's password: ")
+    date = datetime.datetime.now()
+    # TODO: encrypt the password
+    insert_user_record(username, fname, lname, street_name, house_no, zip_code, city, email, mobile_phone, role, password, date)       
+
+ # Admin's functions        
 
 def add_admin():
     username = input("Enter Admin's username: ")
@@ -209,6 +252,33 @@ def check_auth(username, password):
         db.close()
 
 
+def get_user_information():
+    username = input("Enter username: ").strip()
+    try: 
+        db = sqlite3.connect('user.db')
+        cursor = db.cursor()
+        sql_select_query = "SELECT * FROM users WHERE username=?"
+        data = cursor.execute(sql_select_query,(username,))
+        for row in data:
+            print("USERNAME: ", row[0])
+            print("FIRSTNAME: ", row[1])
+            print("LASTNAME: ", row[2])
+            print("STREET NAME: ", row[3])
+            print("HOUSE NO: ", row[4])
+            print("ZIP CODE: ", row[5])
+            print("CITY: ", row[6])
+            print("EMAIL: ", row[7])
+            print("PHONE NUMBER: ", row[8])
+            print("USER ROLE: ", row[9])
+            print("PASSWORD: ", row[10])
+            print("USER CREATED DATE: ", row[11])
+
+        
+    except:
+        raise Exception("Error occured")
+    finally:
+        db.close()
+
 
 def login_view():
     username = input("Enter username: ")
@@ -219,19 +289,22 @@ def login_view():
         super_main()    
     return login_value
 
-
+# Create backup/zip file 
+def create_backup():
+    with zipfile.ZipFile('backup.zip', 'w') as z:
+        z.write('user.db')
 # This is main interface for the program
 def super_main():
     login_value =  login_view()
     print("login_value::", login_value)
     login_auth = login_value["Authenticate"]
     login_role = login_value["user_role"]
-    if login_auth:
+    if login_auth and login_role == "superadmin":
         def main():
             # get user Role
 
             # User menu
-            print("             WELCOME !!!")
+            print("             WELCOME SUPER ADMIN !!!")
             print("             *************")
             print("""
             1. ADD ADMIN TO THE SYSTEM
@@ -239,7 +312,8 @@ def super_main():
             3. UPDATE ADMIN'S PASSWORD
             4. DELETE ADMIN
             5. GET ALL ADMIN
-            7. BACK UP
+            6. BACK UP
+            7. SEARCH AND RETRIVE USER INFORMATION
             """)
             choice = input("ENTER YOUR CHOICE NUMBER OR ENTER 0 TO EXIT : ")
             print("choice>>", choice)
@@ -262,10 +336,71 @@ def super_main():
                     main()
                 elif(choice == "4"):
                     delete_admin()
+                    print("ADMIN SUCCESFULLY UPDATED!!!")
+                elif(choice == "6"):
+                    # Create Backup
+                    create_backup()
+                    print("BACKUP CREATED SUCCESFULLY!!!")
+                elif(choice == "7"):
+                    get_user_information()
+                    main()
                 else:
                     print("wrong Choice!")
                    
         main()
+    
+    elif login_auth and login_role == "admin":
+         def main():
+            # get user Role
+
+            # User menu
+            print("             WELCOME ADMIN !!!")
+            print("             *************")
+            print("""
+            1. ADD ADVISOR TO THE SYSTEM
+            2. GET LIST OF USER AND ROLE
+            3. UPDATE ADVISOR'S PASSWORD
+            4. DELETE ADVISOR
+            5. GET ALL ADVISOR
+            6. BACK UP
+            7. SEARCH AND RETRIVE USER INFORMATION
+            """)
+            choice = input("ENTER YOUR CHOICE NUMBER OR ENTER 0 TO EXIT : ")
+            print("choice>>", choice)
+            system_exit = True
+            while system_exit:
+            
+                if(choice == '0'):
+                    print("Program Closed")
+                    system_exit = False
+                elif(choice == '1'):
+                    add_advisor()
+                    print("A new Advisor added!!!")
+                    main()
+                elif(choice == "2"):
+                    get_all_user_and_role()
+                    main()
+                elif(choice == "3"):
+                    update_admin_password()
+                    print("PASSWORD IS SUCCESFULLY UPDATED!!!")
+                    main()
+                elif(choice == "4"):
+                    delete_admin()
+                    print("ADMIN SUCCESFULLY UPDATED!!!")
+                elif(choice == "6"):
+                    # Create Backup
+                    create_backup()
+                    print("BACKUP CREATED SUCCESFULLY!!!")
+                elif(choice == "7"):
+                    get_user_information()
+                    main()
+                else:
+                    print("wrong Choice!")
+                   
+         main()
+         
+        
+        
         
 
 

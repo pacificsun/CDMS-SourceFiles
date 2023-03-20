@@ -241,14 +241,14 @@ def update_admin_password():
             db.close()
 
 def delete_admin():
-    username = input("Enter username that you want to delete")
+    username = input("Enter username that you want to delete: ")
     user_check = get_user_by_username(username)
     if user_check:
         try: 
             db = sqlite3.connect('user.db')
             cursor = db.cursor()
             sql_statement = "DELETE from users WHERE username=?"
-            data = cursor.execute(sql_statement, (username))
+            data = cursor.execute(sql_statement, (username,))
             db.commit()
         except:
             raise Exception("Error occured")
@@ -335,6 +335,8 @@ def login_view():
 def create_backup():
     with zipfile.ZipFile('backup.zip', 'w') as z:
         z.write('user.db')
+
+
 # This is main interface for the program
 def super_main():
     login_value =  login_view()

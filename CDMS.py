@@ -32,33 +32,9 @@ if(listOfTables) == []:
             password text,
             date text
     )""")
-    cur.execute(''' INSERT INTO users(
-            username,
-            fname,
-            lname,
-            street_name,
-            house_no,
-            zip_code,
-            city,
-            email,
-            mobile_phone,
-            role,
-            password,
-            date
-            ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)''', ('superadmin','Admin', 'Admin', 'Wolf Street',"4000A",'76904','San Angelo','superadmin@gmail.com','+1-6-32562529','superadmin','Admin!23', '15-03-2023' ))
-            
-# Create a Table for logs
-
-    # cur.execute("""CREATE TABLE logs (
-    #     username text,
-    #     date text,
-    #     Time text,
-    #     description_of_activity text,
-    #     additional_information text,
-    #     suspicious text
-    # )""")
+  
     print("TABLES CREATED SUCCESSFULLY!!!")
-    print("SYSTEM DATA IS LOADED SUCCESSFULLY!!!")
+   
 
 
 # Commit our command
@@ -87,6 +63,20 @@ def phonenumber_validation(phonenumber):
     validated_phonenumber = phonenumber.strip()
     phonenumber_with_code = '+1-6-'+validated_phonenumber
     return phonenumber_with_code
+
+#Caesar cipher encryption       
+def encrypt_password(plaintext, n):
+    ans=""
+    for i in range(len(plaintext)):
+        ch = plaintext[i]
+        if ch == " ":
+            ans+=" "
+        elif(ch.isupper()):
+            ans+= chr((ord(ch) + n-65) % 26 + 65)
+
+        else:
+            ans+= chr(ord(ch) + n-97 % 26 + 97)
+    return ans
 
 # functions
 def  insert_user_record(username,
@@ -144,8 +134,9 @@ def add_advisor():
     role = 'Advisor'
     password = input("Enter Advisor's password: ")
     date = datetime.datetime.now()
-    # TODO: encrypt the password
-    insert_user_record(username, fname, lname, street_name, house_no, zip_code, city, email, mobile_phone, role, password, date)      
+
+    encrypted_password = encrypt_password(password, 1)
+    insert_user_record(username, fname, lname, street_name, house_no, zip_code, city, email, mobile_phone, role, encrypted_password, date)      
 
 
 def update_advisor_password():
@@ -196,8 +187,9 @@ def add_admin():
     role = 'Admin'
     password = input("Enter Admin's password: ")
     date = datetime.datetime.now()
-    # TODO: encrypt the password
-    insert_user_record(username, fname, lname, street_name, house_no, zip_code, city, email, mobile_phone, role, password, date)
+
+    encrypted_password = encrypt_password(password, 1)
+    insert_user_record(username, fname, lname, street_name, house_no, zip_code, city, email, mobile_phone, role, encrypted_password, date)
 
 def get_user_by_username(username):
     # returns ture if username is found else returns false
@@ -235,7 +227,8 @@ def update_admin_password():
     username = input("Enter admin's username that you want to update: ")
     user_check = get_user_by_username(username)
     if user_check:
-        newpassword = input("Enter new password: ")
+        new_password = input("Enter new password: ")
+        newpassword = encrypt_password(new_password, 1)
         try: 
             db = sqlite3.connect('user.db')
             cursor = db.cursor()
@@ -282,13 +275,14 @@ def get_all_admin():
 def check_auth(username, password):
     
     user_credential = {}
-    
+    encrypt_pass = encrypt_password(password, 1)
+
     #check the username password are correct
     try:
         db = sqlite3.connect('user.db')
         cursor = db.cursor()
         sql_select_query = "SELECT * FROM users WHERE username=? AND password=?"
-        data = cursor.execute(sql_select_query,(username,password))
+        data = cursor.execute(sql_select_query,(username,encrypt_pass))
         for row in data:
             user_credential["user_role"] = row[9]
             user_credential["Authenticate"] = True
@@ -368,13 +362,13 @@ def super_main():
             7. SEARCH AND RETRIVE USER INFORMATION
             """)
             choice = input("ENTER YOUR CHOICE NUMBER OR ENTER 0 OR CMD/CTRL + C TO EXIT: ")
-            # print("choice>>", choice)
             system_exit = True
             while system_exit:
             
                 if(choice == '0'):
                     print("Program Closed!!!")
                     system_exit = False
+                    super_main()
                 elif(choice == '1'):
                     add_admin()
                     print("A new admin added!!!")
@@ -388,16 +382,22 @@ def super_main():
                     main()
                 elif(choice == "4"):
                     delete_admin()
-                    print("ADMIN SUCCESFULLY UPDATED!!!")
+                    print("ADMIN SUCCESFULLY DELETED!!!")
+                    main()
+                elif(choice == "5"):
+                    get_all_admin()
+                    main()
                 elif(choice == "6"):
                     # Create Backup
                     create_backup()
                     print("BACKUP CREATED SUCCESFULLY!!!")
+                    main()
                 elif(choice == "7"):
                     get_user_information()
                     main()
                 else:
                     print("wrong Choice!")
+                    main()
                    
         main()
     
@@ -422,13 +422,13 @@ def super_main():
             7. SEARCH AND RETRIVE USER INFORMATION
             """)
             choice = input("ENTER YOUR CHOICE NUMBER OR ENTER 0 OR CMD/CTRL + C TO EXIT: ")
-            #print("choice>>", choice)
             system_exit = True
             while system_exit:
             
                 if(choice == '0'):
-                    print("Program Closed")
+                    print("Program Closed!!!")
                     system_exit = False
+                    super_main()
                 elif(choice == '1'):
                     add_advisor()
                     print("A new Advisor added!!!")
@@ -457,21 +457,13 @@ def super_main():
                     main()
                 else:
                     print("wrong Choice!")
+                    main()
                    
          main()
          
         
         
         
-
-
-def create_user():
-    print("User create function")
-
-def update_user():
-    print("Update user")
-def update_user():
-    print("update user")
 
 
 # To run the supermain function.

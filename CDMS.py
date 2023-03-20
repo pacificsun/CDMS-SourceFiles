@@ -163,6 +163,24 @@ def update_advisor_password():
             raise Exception("Error occured")
         finally:
             db.close()
+
+def get_all_advisor():
+    role="Advisor"
+    try:
+        db = sqlite3.connect('user.db')
+        cursor = db.cursor()
+        sql_select_query = "SELECT * FROM users WHERE role=?"
+        data = cursor.execute(sql_select_query,(role,))
+
+
+        for record in data:
+            # print("Record",record)
+            print("USERNAME: ", record[0])
+            print ("ROLE: ", record[9]+'\n')
+           
+    finally:
+        db.close()
+
  # Admin's functions        
 
 def add_admin():
@@ -203,10 +221,9 @@ def get_all_user_and_role():
         db = sqlite3.connect('user.db')
         cursor = db.cursor()
         data = cursor.execute(''' SELECT * FROM users''')
-        username_and_role = {}
 
         for record in data:
-            print("Record",record)
+            # print("Record",record)
             print("USERNAME: ", record[0])
             print ("ROLE: ", record[9]+'\n')
            
@@ -244,6 +261,9 @@ def delete_admin():
             raise Exception("Error occured")
         finally:
             db.close() 
+
+ 
+
 def check_auth(username, password):
     
     user_credential = {}
@@ -257,7 +277,6 @@ def check_auth(username, password):
         for row in data:
             user_credential["user_role"] = row[9]
             user_credential["Authenticate"] = True
-            print(user_credential)
             return user_credential
     except: 
         raise Exception('Error occured')
@@ -310,7 +329,7 @@ def create_backup():
 # This is main interface for the program
 def super_main():
     login_value =  login_view()
-    print("login_value::", login_value)
+    # print("login_value::", login_value)
     login_auth = login_value["Authenticate"]
     login_role = login_value["user_role"]
     if login_auth and login_role == "superadmin":
@@ -318,8 +337,12 @@ def super_main():
             # get user Role
 
             # User menu
+            print("                                     ")
+            print("                                     ")
+            print("                                     ")
+            print("            ************************")
             print("             WELCOME SUPER ADMIN !!!")
-            print("             *************")
+            print("            ************************")
             print("""
             1. ADD ADMIN TO THE SYSTEM
             2. GET LIST OF USER AND ROLE
@@ -330,7 +353,7 @@ def super_main():
             7. SEARCH AND RETRIVE USER INFORMATION
             """)
             choice = input("ENTER YOUR CHOICE NUMBER OR ENTER 0 TO EXIT : ")
-            print("choice>>", choice)
+            # print("choice>>", choice)
             system_exit = True
             while system_exit:
             
@@ -363,13 +386,17 @@ def super_main():
                    
         main()
     
-    elif login_auth and login_role == "admin":
+    elif login_auth and login_role == "Admin":
          def main():
             # get user Role
 
             # User menu
-            print("             WELCOME ADMIN !!!")
-            print("             *************")
+            print("                                     ")
+            print("                                     ")
+            print("                                     ")
+            print("            ************************")
+            print("                WELCOME ADMIN !!!")
+            print("            ************************")
             print("""
             1. ADD ADVISOR TO THE SYSTEM
             2. GET LIST OF USER AND ROLE
@@ -400,11 +427,16 @@ def super_main():
                     main()
                 elif(choice == "4"):
                     delete_admin()
-                    print("ADVISOR SUCCESFULLY UPDATED!!!")
+                    print("ADVISOR SUCCESFULLY DELETED!!!")
+                    main()
+                elif(choice == "5"):
+                    get_all_advisor()
+                    main()
                 elif(choice == "6"):
                     # Create Backup
                     create_backup()
                     print("BACKUP CREATED SUCCESFULLY!!!")
+                    main()
                 elif(choice == "7"):
                     get_user_information()
                     main()

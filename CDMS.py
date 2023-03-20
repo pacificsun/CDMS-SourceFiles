@@ -145,8 +145,24 @@ def add_advisor():
     password = input("Enter Advisor's password: ")
     date = datetime.datetime.now()
     # TODO: encrypt the password
-    insert_user_record(username, fname, lname, street_name, house_no, zip_code, city, email, mobile_phone, role, password, date)       
+    insert_user_record(username, fname, lname, street_name, house_no, zip_code, city, email, mobile_phone, role, password, date)      
 
+
+def update_advisor_password():
+    username = input("Enter advisor's username that you want to update: ")
+    user_check = get_user_by_username(username)
+    if user_check:
+        newpassword = input("Enter new password: ")
+        try: 
+            db = sqlite3.connect('user.db')
+            cursor = db.cursor()
+            sql_statement = "UPDATE users set password=? WHERE username=?"
+            data = cursor.execute(sql_statement, (newpassword,username))
+            db.commit()
+        except:
+            raise Exception("Error occured")
+        finally:
+            db.close()
  # Admin's functions        
 
 def add_admin():
@@ -167,7 +183,6 @@ def add_admin():
 
 def get_user_by_username(username):
     # returns ture if username is found else returns false
-    print("get a user")
     user_exist = True
     try: 
         db = sqlite3.connect('user.db')
@@ -216,8 +231,7 @@ def update_admin_password():
             db.close()
 
 def delete_admin():
-    print("Delete Admin")
-    username = input("Enter admin's username that you want to delete")
+    username = input("Enter username that you want to delete")
     user_check = get_user_by_username(username)
     if user_check:
         try: 
@@ -366,7 +380,7 @@ def super_main():
             7. SEARCH AND RETRIVE USER INFORMATION
             """)
             choice = input("ENTER YOUR CHOICE NUMBER OR ENTER 0 TO EXIT : ")
-            print("choice>>", choice)
+            #print("choice>>", choice)
             system_exit = True
             while system_exit:
             
@@ -381,12 +395,12 @@ def super_main():
                     get_all_user_and_role()
                     main()
                 elif(choice == "3"):
-                    update_admin_password()
-                    print("PASSWORD IS SUCCESFULLY UPDATED!!!")
+                    update_advisor_password()
+                    print("PASSWORD SUCCESFULLY UPDATED!!!")
                     main()
                 elif(choice == "4"):
                     delete_admin()
-                    print("ADMIN SUCCESFULLY UPDATED!!!")
+                    print("ADVISOR SUCCESFULLY UPDATED!!!")
                 elif(choice == "6"):
                     # Create Backup
                     create_backup()

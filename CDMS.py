@@ -3,6 +3,7 @@ import sqlite3
 import datetime
 import zipfile
 import re
+import base64
 
 # Create database Connection
 con = sqlite3.connect('user.db')
@@ -262,7 +263,22 @@ def delete_admin():
         finally:
             db.close() 
 
- 
+def get_all_admin():
+    role="Admin"
+    try:
+        db = sqlite3.connect('user.db')
+        cursor = db.cursor()
+        sql_select_query = "SELECT * FROM users WHERE role=?"
+        data = cursor.execute(sql_select_query,(role,))
+
+
+        for record in data:
+            # print("Record",record)
+            print("USERNAME: ", record[0])
+            print ("ROLE: ", record[9]+'\n')
+           
+    finally:
+        db.close() 
 
 def check_auth(username, password):
     
@@ -352,13 +368,13 @@ def super_main():
             6. BACK UP
             7. SEARCH AND RETRIVE USER INFORMATION
             """)
-            choice = input("ENTER YOUR CHOICE NUMBER OR ENTER 0 TO EXIT : ")
+            choice = input("ENTER YOUR CHOICE NUMBER OR ENTER 0 OR CMD/CTRL + C TO EXIT: ")
             # print("choice>>", choice)
             system_exit = True
             while system_exit:
             
                 if(choice == '0'):
-                    print("Program Closed")
+                    print("Program Closed!!!")
                     system_exit = False
                 elif(choice == '1'):
                     add_admin()
@@ -406,7 +422,7 @@ def super_main():
             6. BACK UP
             7. SEARCH AND RETRIVE USER INFORMATION
             """)
-            choice = input("ENTER YOUR CHOICE NUMBER OR ENTER 0 TO EXIT : ")
+            choice = input("ENTER YOUR CHOICE NUMBER OR ENTER 0 OR CMD/CTRL + C TO EXIT: ")
             #print("choice>>", choice)
             system_exit = True
             while system_exit:
